@@ -5,17 +5,6 @@ var url = 'https://guidedlearning.oracle.com/player/latest/api/scenario/get/v_Il
 
 //httpGetAsync(url,callback)
 
-function httpGetAsync(theUrl, callback)
-{
-    var req = new XMLHttpRequest();
-    req.onreadystatechange = function() { 
-        if (req.readyState == 4 && req.status == 200)
-            callback(req.responseText);
-    }
-    req.open("GET", theUrl, true); // true for asynchronous 
-    req.send(null);
-
-}
 
 function jsonp(url, callback) {
     var callbackName = 'jsonp_callback';
@@ -23,6 +12,7 @@ function jsonp(url, callback) {
         delete window[callbackName];
         document.body.removeChild(script);
         callback(data);
+        console.log("done!");
     };
 
     var script = document.createElement('script');
@@ -33,10 +23,10 @@ function jsonp(url, callback) {
 function callback(jsonpObject) {
 	var dataObject = jsonpObject["data"];
 	var cssContent = dataObject["css"];
-    var stepsArray = getSteps(dataObject);
-	var tiplates = getTiplates(dataObject);
+    var stepsArray = getStepsStructure(dataObject);
+	createTemplates(dataObject);
 	var tipArray = getTips(stepsArray);
-	//makeTip(tipArray[0], tipArray[1], tiplates[0]);
+	makeTip(tipArray[0], tipArray[1]);
 
 	//css file
 	createCss(cssContent);
@@ -44,8 +34,6 @@ function callback(jsonpObject) {
 }
 
 jsonp(url,callback);
-
-
 
 
 function createCss(cssContent) {
@@ -57,32 +45,89 @@ function createCss(cssContent) {
 }
 
 
-function getSteps(dataObject){
+function getStepsStructure(dataObject){
 	var structure = dataObject["structure"];
 	var steps = structure["steps"];
 	return steps;
 }
 
-function getTiplates(dataObject){
-	var tiplates = dataObject["tiplates"];
-	var hoverTip = tiplates["hoverTip"];
-	var tip = tiplates["tip"];
-	return [hoverTip,tip];
-}
+
+
+// check every field before
 function getTips(stepsArray){
 	var first = stepsArray[1];
 	var action = first["action"];
 	var contents = action["contents"];
-	var content = contents["#content"];
+	var content = null;
+	if (contents != null) {
+		content = contents["#content"];
+	}
 	var selector = action["selector"]
 	return [content,selector];
 
 }
 
-function makeTip(content,selector,tiplates){
-	var se = document.querySelector(selector);
+// create tip elements
+function makeTip(content,selector){
+	var selectorObj;
+	if(includesContains(selector)) {
+		selectorObj = containSelector(selector);
+	} else {
+		selectorObj = document.querySelector(selector);
+	}
+	
 	const div = document.createElement('div');
-	div.textContent = tiplate;
-	document.se.appendChild(div);
+	//div.innerHTML = tiplate;
+	if (selectorObj != null) {
+		//selectorObj.append(div);
+		selectorObj.appendChild(div);
+
+	}
+
+}
+
+// invesitages if the selectorText is a real selector and returns a boolean
+function includesContains(selectorText){
+	if (selectorText.includes("contains")) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function containSelector(selectorText){
+	var split = selectorText.split(":")
+	var selector = split[0];
+	var containsText = split[1];
+	containsText = containsText.split("contains(\"")[1];
+	containsText = containsText.split("\"\)")[0];a
+	var selectors = document.querySelectorAll(selector);
+	selectors.forEach( function(sel) {
+		if (sel.textContent.includes(containsText)) {
+			selector = sel;
+		}
+	});
+	return selector;
+
+}
+
+// creating templates for the tips from json object
+function createTemplates(dataObject){
+	var templateNames = ["hoverTip", "tip"];
+	var tiplate ;
+	var fragment = document.createDocumentFragment();
+	templateNames.forEach(function (name) {
+		var tiplates = dataObject["tiplates"];
+		tiplate = tiplates[name];
+		var templateObj = document.createElement("template");
+		templateObj.id = name;
+		// need to fix
+		templateObj.innerHTML = tiplate;
+        fragment.appendChild(templateObj);
+        document.body.appendChild(fragment);
+
+// 		templateObj.innerHTML = tiplate;
+// 		document.body.appendChild(templateObj);
+	})
 
 }
