@@ -1,6 +1,6 @@
 # Guided-learning-solution
-This GLS (guided learning solution) program guides a new user on how to use google.com
-On the google.com webpage there are tooltips to help guide the website.
+This GLS (guided learning solution) program guides a new user through google.com.
+The guide shows tooltips to help guide the user through the website.
 
 ## JSNOP file
 Firstly, I requested the JSONP file that contains the information about the guide.
