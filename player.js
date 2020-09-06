@@ -36,12 +36,6 @@ function callback(jsonpObject) {
 
 jsonp(url,callback);
 
-var tooltip = ".tooltip {\nposition: relative;\ndisplay: inline-block;\nborder-bottom: 1px dotted black;\n}\n" +
- ".tooltip .tooltiptext {\nvisibility: hidden;\nwidth: 120px;\nbackground-color: black;\ncolor: #fff;\ntext-align: center;\nborder-radius: 6px;\npadding: 5px 0;\nposition: absolute;\nz-index: 1;\n}\n"
- + ".tooltip:hover .tooltiptext {\nvisibility: visible;\n}"
-var style = document.createElement('style');
-style.innerHTML = tooltip;
-//document.head.appendChild(style);
 
 
 function regToolTip(selector){
@@ -56,32 +50,6 @@ function regToolTip(selector){
 
 
 }
-
-function tippy(){
-
-//     var script = document.createElement("script");
-// 	script.src = "https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js";
-// 	document.body.appendChild(script);
-
-// 	script = document.createElement("script");
-// 	script.src = "https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js";
-// 	document.body.appendChild(script);
-
-	script = document.createElement("script");
-	script.src = "https://unpkg.com/@popperjs/core@2";
-	document.body.appendChild(script);
-	script = document.createElement("script");
-	script.src="https://unpkg.com/tippy.js@6";
-    document.body.appendChild(script);
-}
-
-
-
-
-
-// var r = document.createElement("div");
-// r.setAttribute("class", "tooltip");
-// document.head.appendChild(r);
 
 
 function createCss(cssContent) {
@@ -127,12 +95,11 @@ function getStepsInfo(stepsArray) {
 	return stepsInfo;
 
 }
-
+var counter =1;
 // create tip elements
 // step [id,type,selector,content]
 function makeTips(stepsInfo){
-
-	stepsInfo.forEach(function (step) {
+    var step = stepsInfo[0];
 		//check type
 	if (step[1] == "tip") {
 		var selectorObj = getSelector(step[2]);
@@ -141,23 +108,35 @@ function makeTips(stepsInfo){
 		}
 		var div = document.createElement('div');
 		var tip = document.getElementById("tip");
-		
-		tippy(selectorObj.id, {
-        content: 'My tooltip!',
-          });
-		
-	    
-	    // adding the steps content and the tip template
-		//selectorObj.innerHTML += step[3] + tip.innerHTML + "jennie";
-		//if making another div
-		//selectorObj.appendChild(div);
+        div.innerHTML =  tip.innerHTML;
+        selectorObj.parentNode.insertBefore(div, selectorObj);
+        //content
+        var content = div.getElementsByClassName("popover-content")[0];
+        content.innerHTML += step[3];
+        //steps
+		var count = div.getElementsByClassName("steps-count")[0];
+		var split = count.textContent.split(" ");
+		count.textContent = split[0] + counter + split[1] + stepsInfo.length;
+		counter += 1;
+        
+        var popover = div.getElementsByClassName("popover-title")[0];
+        var close = popover.getElementsByTagName('button')[0];
+        close.tip = div;
+
+		close.addEventListener("click", closeButton);
+
 	} else if (step[1] == "closeScenario") {
 		console.log("closing");
 	}
-	})
+	
 
 }
+  
 
+function closeButton(event){
+	event.currentTarget.parentNode.parentNode.remove();
+
+}
 
 // returns selector from the document
 function getSelector(selectorText){
@@ -215,42 +194,4 @@ function createTemplates(dataObject){
 	})
 
 }
-
-
-function makeTipWithBootstrap() {
-
-	var el = document.createElement("link");
-	el.setAttribute("rel","stylesheet");
-	el.setAttribute("href","https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css");
-	document.head.appendChild(el);
-	el = document.createElement("script");
-	el.setAttribute("src","https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js");
-	document.head.appendChild(el);
-	el = document.createElement("script");
-	el.setAttribute("src","https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js");
-	document.head.appendChild(el);
-	var div = document.createElement("div");
-	div.setAttribute("class","container");
-	document.body.appendChild(div);
-	el = document.createElement("h1");
-	el.textContent = "Tooltip";
-	div.appendChild(el);
-	el = document.createElement("a");
-	el.setAttribute("href","#");
-	el.setAttribute("data-toggle","tooltip");
-	el.setAttribute("title","Hooray");
-	el.textContent = "Hover over me";
-	div.appendChild(el);
-
-
-
-
-
-
-
-
-}
-// $(document).ready(function(){
-//   $('[data-toggle="tooltip"]').tooltip();   
-// });
 
