@@ -11,5 +11,7 @@ id, type, selector, placement, content, templates (data field) and style for the
 
 ## Creating tooltips
 I added the style and template tags to the html for the future tips.
-The next step is to find the elements on the google.com html file and adding the correct templates that were given in the JSONP file.
+Then I found the elements on the google.com html file and added the correct templates that were given in the JSONP file and added the content that will be displayed on the tooltip.
+The next step would adding event listeners on the buttons of the tooltips and creating a flow in the guide.
+The 'next' button would lead to the next tip, 'previous' button would go back to the previous tooltip (if possible).
 
